@@ -1,0 +1,131 @@
+name: ${APP_NAME_HOST}
+
+networks:
+  internal:
+    name: ${APP_NAME_HOST}_internal
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "${APP_NETWORK_POOL}"
+
+volumes:
+  habitat-config:
+  romm-resources:
+  romm-config:
+
+secrets:
+  ROMM_AUTH_SECRET_KEY:
+    file: ${SECRETS_DIR}/ROMM_AUTH_SECRET_KEY
+  ROMM_MYSQL_PASSWORD:
+    file: ${SECRETS_DIR}/ROMM_MYSQL_PASSWORD
+  ROMM_MYSQL_PASSWORD_HASH:
+    file: ${SECRETS_DIR}/ROMM_MYSQL_PASSWORD_HASH
+  REDIS_PASSWORD:
+    file: ${SECRETS_DIR}/REDIS_PASSWORD
+  ROMM_OAUTH_CLIENT_ID:
+    file: ${SECRETS_DIR}/ROMM_OAUTH_CLIENT_ID
+  ROMM_OAUTH_CLIENT_SECRET:
+    file: ${SECRETS_DIR}/ROMM_OAUTH_CLIENT_SECRET
+  ROMM_OAUTH_CLIENT_SECRET_HASHED_PBKDF2:
+    file: ${SECRETS_DIR}/ROMM_OAUTH_CLIENT_SECRET_HASHED_PBKDF2
+  SCREENSCRAPER_USER:
+    file: ${SECRETS_DIR}/SCREENSCRAPER_USER
+  SCREENSCRAPER_PASSWORD:
+    file: ${SECRETS_DIR}/SCREENSCRAPER_PASSWORD
+  RETROACHIEVEMENTS_API_KEY:
+    file: ${SECRETS_DIR}/RETROACHIEVEMENTS_API_KEY
+
+
+services:
+
+  habitat-config-den:
+    image: tschebbischeff/habitat-config:latest
+    container_name: ${APP_NAME_HOST}_habitat-config-den
+    restart: no
+    env_file:
+      - ./.env
+      - path: ${ENV_DIR}/.env
+        required: false
+      - path: ${ENV_DIR}/habitat-config.env
+        required: false
+    environment:
+      MODULE_NAME: "den"
+    secrets:
+      - ROMM_MYSQL_PASSWORD_HASH
+      - ROMM_OAUTH_CLIENT_ID
+      - ROMM_OAUTH_CLIENT_SECRET_HASHED_PBKDF2
+    networks:
+      internal:
+    volumes:
+      - habitat-config:/habitat-config/orchestration
+      - ./habitat-config:/habitat-config/source:ro
+      - romm-config:/habitat-config/target/romm
+
+  romm:
+    image: rommapp/romm:latest
+    container_name: ${APP_NAME_HOST}_romm
+    restart: unless-stopped
+    expose:
+      - '8080'
+    env_file:
+      - ./.env
+      - path: ${ENV_DIR}/.env
+        required: false
+      - path: ${ENV_DIR}/romm.env
+        required: false
+    environment:
+      ROMM_AUTH_SECRET_KEY_FILE: '/run/secrets/ROMM_AUTH_SECRET_KEY'
+      DB_HOST: '${APP_NAME_HOST}_mariadb'
+      DB_NAME: 'habitat_romm'
+      DB_USER: 'romm'
+      DB_PASSWD_FILE: '/run/secrets/ROMM_MYSQL_PASSWORD'
+      REDIS_HOST: '${APP_NAME_HOST}_redis'
+      REDIS_PASSWORD_FILE: '/run/secrets/REDIS_PASSWORD'
+      REDIS_DB: '1'
+      DISABLE_SETUP_WIZARD: 'true'
+      ROMM_BASE_URL: 'https://romm.${APP_HOST}'
+      OIDC_ENABLED: 'true'
+      OIDC_AUTOLOGIN: 'true'
+      OIDC_ALLOW_REGISTRATION: 'true'
+      OIDC_PROVIDER: 'authelia'
+      OIDC_CLIENT_ID_FILE: '/run/secrets/ROMM_OAUTH_CLIENT_ID'
+      OIDC_CLIENT_SECRET_FILE: '/run/secrets/ROMM_OAUTH_CLIENT_SECRET'
+      OIDC_REDIRECT_URI: 'https://romm.${APP_HOST}/api/oauth/openid'
+      OIDC_SERVER_APPLICATION_URL: 'https://authelia.${APP_HOST}'
+      OIDC_CLAIM_ROLES: 'groups'
+      OIDC_ROLE_VIEWER: 'romm_users'
+      OIDC_ROLE_ADMIN: 'admins,romm_admins'
+      OIDC_RP_INITIATED_LOGOUT: 'true'
+      OIDC_END_SESSION_ENDPOINT: 'https://authelia.${APP_HOST}/logout?rd=https%3A%2F%2Fromm.${APP_HOST}'
+      OIDC_USERNAME_ATTRIBUTE: 'preferred_username'
+      SCREENSCRAPER_USER_FILE: '/run/secrets/SCREENSCRAPER_USER'
+      SCREENSCRAPER_PASSWORD_FILE: '/run/secrets/SCREENSCRAPER_PASSWORD'
+      HASHEOUS_API_ENABLED: 'true'
+      RETROACHIEVEMENTS_API_KEY_FILE: '/run/secrets/RETROACHIEVEMENTS_API_KEY'
+      FLASHPOINT_API_ENABLED: 'true'
+      HLTB_API_ENABLED: 'true'
+    secrets:
+      - ROMM_AUTH_SECRET_KEY
+      - ROMM_MYSQL_PASSWORD
+      - REDIS_PASSWORD
+      - ROMM_OAUTH_CLIENT_ID
+      - ROMM_OAUTH_CLIENT_SECRET
+      - SCREENSCRAPER_USER
+      - SCREENSCRAPER_PASSWORD
+      - RETROACHIEVEMENTS_API_KEY
+    volumes:
+      - romm-resources:/romm/resources
+      - romm-config:/romm/config
+      - ${VOLUME_DIR}/romm-library:/romm/library
+      - ${VOLUME_DIR}/romm-assets:/romm/assets
+    networks:
+      internal:
+    # healthcheck:
+    #   test: [ "CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:1337/healthz" ]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+    #   start_period: 10s
+    depends_on:
+      habitat-config-den:
+        condition: service_completed_successfully
