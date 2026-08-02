@@ -80,6 +80,7 @@ services:
       DB_USER: 'romm'
       DB_PASSWD_FILE: '/run/secrets/ROMM_MYSQL_PASSWORD'
       REDIS_HOST: '${APP_NAME_HOST}_redis'
+      REDIS_PORT: '6379'
       REDIS_PASSWORD_FILE: '/run/secrets/REDIS_PASSWORD'
       REDIS_DB: '1'
       DISABLE_SETUP_WIZARD: 'true'
@@ -124,8 +125,8 @@ services:
     #   test: [ "CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:1337/healthz" ]
     #   interval: 30s
     #   timeout: 10s
-    #   retries: 5
-    #   start_period: 10s
+    #   retries: 3
+    #   start_period: 30s
     depends_on:
       habitat-config-den:
         condition: service_completed_successfully
