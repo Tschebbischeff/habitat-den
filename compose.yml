@@ -62,7 +62,8 @@ services:
       - romm-config:/habitat-config/target/romm
 
   romm:
-    image: rommapp/romm:latest
+    build:
+      context: ./romm
     container_name: ${APP_NAME_HOST}_romm
     restart: unless-stopped
     expose:

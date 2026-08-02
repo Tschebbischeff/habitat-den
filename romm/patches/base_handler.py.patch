@@ -1,0 +1,11 @@
+--- orig.py	2026-08-02 05:29:06.585780443 +0200
++++ changed.py	2026-08-02 05:32:22.649503378 +0200
+@@ -423,7 +423,7 @@
+         claims_provided = OIDC_CLAIM_ROLES and OIDC_CLAIM_ROLES in userinfo
+         if claims_provided:
+             roles = userinfo[OIDC_CLAIM_ROLES] or []
+-            if OIDC_ROLE_ADMIN and OIDC_ROLE_ADMIN in roles:
++            if OIDC_ROLE_ADMIN and any(map(lambda role: role.strip() in roles, OIDC_ROLE_ADMIN.split(","))):
+                 role = Role.ADMIN
+             elif (OIDC_ROLE_EDITOR and OIDC_ROLE_EDITOR in roles) or (
+                 OIDC_ROLE_VIEWER
