@@ -33,6 +33,8 @@ You can check out all officially available modules [here](https://github.com/Tsc
 
  - [![Habitat-Module: Path](https://img.shields.io/badge/Habitat--Module-Path-_?style=flat&color=gray&labelColor=gray)](https://github.com/Tschebbischeff/habitat-path)
  - [![Habitat-Module: Scent](https://img.shields.io/badge/Habitat--Module-Scent-_?style=flat&color=gray&labelColor=gray)](https://github.com/Tschebbischeff/habitat-scent)
+ - [![Habitat-Module: Thicket](https://img.shields.io/badge/Habitat--Module-Thicket-_?style=flat&color=gray&labelColor=gray)](https://github.com/Tschebbischeff/habitat-thicket)
+ - [![Habitat-Module: Cache](https://img.shields.io/badge/Habitat--Module-Cache-_?style=flat&color=gray&labelColor=gray)](https://github.com/Tschebbischeff/habitat-cache)
 
 ### Configuration
 
@@ -103,7 +105,7 @@ SECRETS_DIR="/run/secrets"
 
 ### Secrets
 
-*This module does not require any secrets.*
+![TODO](https://img.shields.io/badge/TODO-Coming_Soon_(TM)-red?style=flat)
 
 <!--
 > [!NOTE]
