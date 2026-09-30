@@ -9,13 +9,21 @@ http:
         servers:
           - url: 'http://{{ env "APP_NAME_HOST" }}_romm:8080'
   routers:
+    romm-status-forward-auth:
+      rule: 'Host(`status.romm.{{ env "APP_HOST" }}`) && Path(`/forward-auth`)'
+      service: noop@internal
+      entryPoints: ["websecure"]
+      middlewares:
+        - "cors-policy"
+        - "auth-proxy"
+      tls:
+        certResolver: porkbun-api
     romm-8080:
       rule: 'Host(`romm.{{ env "APP_HOST" }}`)'
       priority: 1
       service: svc_romm-8080
       entryPoints: ["websecure"]
       middlewares:
-        - "sts-headers"
         - "cors-policy"
       tls:
         certResolver: porkbun-api

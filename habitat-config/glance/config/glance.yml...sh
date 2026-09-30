@@ -44,6 +44,7 @@ cat >"$SOURCE_FILE_APP_SITE" <<'EOF'
       data-lib-femon
       data-lib-femon-title="RomM"
       data-lib-femon-url="https://romm.${APP_HOST}"
+      data-lib-femon-check-url="https://status.romm.${APP_HOST}/forward-auth"
       data-lib-femon-hide-codes="403"
       data-lib-femon-icon="/assets/icons/di/romm.svg"
     ></div>
