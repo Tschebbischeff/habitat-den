@@ -1,6 +1,8 @@
 access_control:
   rules:
-    - domain: '*.romm.{{ env "APP_HOST" }}'
+    - domain:
+        - 'romm.{{ env "APP_HOST" }}'
+        - '*.romm.{{ env "APP_HOST" }}'
       subject: 'group:romm_users'
       policy: one_factor
 
