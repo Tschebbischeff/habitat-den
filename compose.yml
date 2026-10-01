@@ -64,6 +64,8 @@ services:
   romm:
     build:
       context: ./romm
+      args:
+        ROMM_VERSION: "${ROMM_VERSION:?}"
     container_name: ${APP_NAME_HOST}_romm
     restart: unless-stopped
     expose:
