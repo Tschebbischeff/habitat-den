@@ -1,5 +1,5 @@
 ARG ROMM_VERSION
-FROM rommapp/romm:${ROMM_VERSION}
+FROM rommapp/romm:${ROMM_VERSION:?}
 
 RUN apk upgrade --no-cache -a; \
     apk add --no-cache patch
